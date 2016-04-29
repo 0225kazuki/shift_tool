@@ -70,6 +70,10 @@ class Console():
         self.cur.execute("""SELECT name,worktime,workcnt,id FROM mem_data;""")
         mem_data = self.cur.fetchall()
 
+
+
+
+
         x = 0
         for j in range(5):
             print("{0:^7}:{1:^6}:{2:^7}".format('name','time','cnt'),end='')
