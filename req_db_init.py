@@ -25,7 +25,12 @@ worktime = {'weekday':config.getfloat('worktime', 'weekday'),
 'bh_holiday':config.getfloat('worktime', 'holiday before holiday')
 }
 member = config.get('member','member').split(",")
-print(member)
+
+config.read('req.conf')
+req_list = []
+for i in range(len(member)):
+    req_list.append(config.get('request','{0}'.format(str(i+1))))
+
 
 #create database
 cur.execute("""select count(*) from sqlite_master where type='table' and name='req_data';""")
@@ -35,6 +40,9 @@ if a[0][0] == 0 :
     for i in range(len(member)):
         cur.execute("""INSERT INTO req_data(name) VALUES('{0}');""".format(member[i]))
 
+for i in range(len(member)):
+    cur.execute("""UPDATE req_data SET req = '{0}' WHERE id = {1};""".format(req_list[i],i+1))
+
 
 print("""
 ---------------------
@@ -43,14 +51,23 @@ print("""
 """)
 
 cur.execute("""SELECT id,name,req FROM req_data;""")
-data = cur.fetchall()
+data = [list(x) for x in cur.fetchall()]
 req = [0]*len(member)
+var = 0
 for i in range(len(member)):
-    print("input shif req [ex >>>1,2,4,6,7]")
+    print('{0} req {1} now'.format(data[i][1],data[i][2]))
+    var = input("add or reset?>>>")
+    if var == 'q':
+        break
+    print("input shift req [ex >>>1,2,4,6,7]")
     req[i] = input('{0}>>>'.format(data[i][1]))
     print("inputed",req[i])
     confirm = input("OK?[y/n]>>>")
     if confirm == "y" or confirm == "":
+        if var == 'add':
+            data[i][2] = data[i][2] + ',' + req[i]
+        else:
+            pass
         cur.execute("""UPDATE req_data SET req="{0}" WHERE id={1};""".format(req[i],data[i][0]))
 
 

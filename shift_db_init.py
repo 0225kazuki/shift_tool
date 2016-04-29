@@ -52,5 +52,13 @@ if a[0][0] == 0 :
     for i in range(len(member)):
         cur.execute("""INSERT INTO mem_data(name,workcnt,worktime) VALUES('{0}',0,0);""".format(member[i]))
 
+#create req config file
+fw = open("req.conf","w")
+fw.write("[request]\n")
+for i in range(len(member)):
+    fw.write("#{0}\n".format(member[i]))
+    fw.write("{0} = \n".format(i+1))
+fw.close
+
 conn.commit()
 conn.close()
