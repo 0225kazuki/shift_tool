@@ -24,10 +24,11 @@ WARNING = '\033[31m'
 FAIL = '\033[91m'
 ENDC = '\033[0m'
 
+
 class Console():
     def __init__(self):
-        self.conn = sqlite3.connect('./day_data.db')
-        self.cur = self.conn.cursor()
+        conn = sqlite3.connect('./day_data.db')
+        cur = conn.cursor()
         '''while True:
             var = input(">>>")
             if var == "":
@@ -40,9 +41,10 @@ class Console():
                 func(self)
             continue
 '''
+
     def get_name(self,id):
-        self.cur.execute("""SELECT id,name FROM mem_data;""")
-        get_name_var = self.cur.fetchall()
+        cur.execute("""SELECT id,name FROM mem_data;""")
+        get_name_var = cur.fetchall()
         if id is None:
             return None
         id = int(id)
@@ -55,11 +57,11 @@ class Console():
 
     def show_worktime(self,name = '',id = 0):
         if name != '':
-            self.cur.execute("""SELECT id,name,worktime,workcnt FROM mem_data WHERE name = '{0}';""".format(name))
-            work_time_cnt = self.cur.fetchall()[0]
+            cur.execute("""SELECT id,name,worktime,workcnt FROM mem_data WHERE name = '{0}';""".format(name))
+            work_time_cnt = cur.fetchall()[0]
         elif id != 0:
-            self.cur.execute("""SELECT id,name,worktime,workcnt FROM mem_data WHERE id = {0};""".format(id))
-            work_time_cnt = self.cur.fetchall()[0]
+            cur.execute("""SELECT id,name,worktime,workcnt FROM mem_data WHERE id = {0};""".format(id))
+            work_time_cnt = cur.fetchall()[0]
         else:
             print("name input erorr")
             return
@@ -67,26 +69,26 @@ class Console():
 
     def show_shift(self,day = 0):
         if day == 0:
-            self.cur.execute("""SELECT month,day,name1,name2,name3 FROM day_data;""")
-            for month,day,name1,name2,name3 in self.cur.fetchall():
+            cur.execute("""SELECT month,day,name1,name2,name3 FROM day_data;""")
+            for month,day,name1,name2,name3 in cur.fetchall():
                 print("{0}/{1}\n".format(month,day))
-                name_id = {name1:self.get_name(name1),name2:self.get_name(name2),name3:self.get_name(name3)}
-                print("\t{0}:{1}\n\t{2}:{3}\n\t{4}:{5}\n".format(name1,self.get_name(name1),name2,self.get_name(name2),name3,self.get_name(name3)))
+                name_id = {name1:get_name(name1),name2:get_name(name2),name3:get_name(name3)}
+                print("\t{0}:{1}\n\t{2}:{3}\n\t{4}:{5}\n".format(name1,get_name(name1),name2,get_name(name2),name3,get_name(name3)))
         else:
-            self.cur.execute("""SELECT month,day,name1,name2,name3 FROM day_data WHERE day = {0};""".format(day))
-            a = self.cur.fetchall()
+            cur.execute("""SELECT month,day,name1,name2,name3 FROM day_data WHERE day = {0};""".format(day))
+            a = cur.fetchall()
             data = [a[0][x] for x in range(5) ]
             #print(data)
             print("{0}/{1}\n".format(data[0],data[1]))
-            print("\t{0}:{1}\n\t{2}:{3}\n\t{4}:{5}\n".format(data[2],self.get_name(data[2]),data[3],self.get_name(data[3]),data[4],self.get_name(data[4])))
+            print("\t{0}:{1}\n\t{2}:{3}\n\t{4}:{5}\n".format(data[2],get_name(data[2]),data[3],get_name(data[3]),data[4],get_name(data[4])))
 
     def show(self):
-        self.cur.execute("""SELECT month,day,name1,name2,name3,date FROM day_data;""")
-        day_data = self.cur.fetchall()
-        self.cur.execute("""SELECT name,worktime,workcnt,id FROM mem_data;""")
-        mem_data = self.cur.fetchall()
-        self.cur.execute("""SELECT id,name,req FROM req_data;""")
-        req_data = self.cur.fetchall()
+        cur.execute("""SELECT month,day,name1,name2,name3,date FROM day_data;""")
+        day_data = cur.fetchall()
+        cur.execute("""SELECT name,worktime,workcnt,id FROM mem_data;""")
+        mem_data = cur.fetchall()
+        cur.execute("""SELECT id,name,req FROM req_data;""")
+        req_data = cur.fetchall()
 
         day_num = 0
         islastweek = 0
@@ -127,18 +129,18 @@ class Console():
                         islastweek = 0
                     break
                 elif var == 'insert' or var == 'i':
-                    self.insert_mem()
-                    self.cur.execute("""SELECT month,day,name1,name2,name3 FROM day_data;""")
-                    day_data = self.cur.fetchall()
-                    self.cur.execute("""SELECT name,worktime,workcnt,id FROM mem_data;""")
-                    mem_data = self.cur.fetchall()
+                    insert_mem()
+                    cur.execute("""SELECT month,day,name1,name2,name3 FROM day_data;""")
+                    day_data = cur.fetchall()
+                    cur.execute("""SELECT name,worktime,workcnt,id FROM mem_data;""")
+                    mem_data = cur.fetchall()
                     break
                 elif var == 'delete' or var == 'd':
-                    self.delete_mem()
-                    self.cur.execute("""SELECT month,day,name1,name2,name3 FROM day_data;""")
-                    day_data = self.cur.fetchall()
-                    self.cur.execute("""SELECT name,worktime,workcnt,id FROM mem_data;""")
-                    mem_data = self.cur.fetchall()
+                    delete_mem()
+                    cur.execute("""SELECT month,day,name1,name2,name3 FROM day_data;""")
+                    day_data = cur.fetchall()
+                    cur.execute("""SELECT name,worktime,workcnt,id FROM mem_data;""")
+                    mem_data = cur.fetchall()
                     break
                 elif var == 'q' or var == 'quit':
                     islastweek = 1
@@ -150,10 +152,10 @@ class Console():
     def worktime_check(self,day = 0):
         if day == 0:
             day = input('day:')
-            print(self.worktime_check(day))
+            print(worktime_check(day))
             return
-        self.cur.execute("""SELECT isholi,ispreholi FROM day_data WHERE day = {0};""".format(day))
-        a = self.cur.fetchall()
+        cur.execute("""SELECT isholi,ispreholi FROM day_data WHERE day = {0};""".format(day))
+        a = cur.fetchall()
         if a == [(0,0)]:
             return worktime["weekday"]
         elif a == [(0,1)]:
@@ -175,27 +177,27 @@ class Console():
             print("illegal input")
 
         while True:
-            self.show_shift(day)
+            show_shift(day)
             #free or not in the day
-            if self.get_rest(day) == 0 :
+            if get_rest(day) == 0 :
                 print("There is no seat in the day",day)
                 time.sleep(1.5)
                 return
 
             #open database
-            self.cur.execute("""SELECT name,worktime,workcnt,id FROM mem_data;""")
-            mem_data = self.cur.fetchall()
-            self.cur.execute("""SELECT name1,name2,name3 FROM day_data WHERE day = {0};""".format(day))
-            day_data = self.cur.fetchall()[0]
-            self.cur.execute("""SELECT id,name,req FROM req_data;""")
-            req_data = self.cur.fetchall()
+            cur.execute("""SELECT name,worktime,workcnt,id FROM mem_data;""")
+            mem_data = cur.fetchall()
+            cur.execute("""SELECT name1,name2,name3 FROM day_data WHERE day = {0};""".format(day))
+            day_data = cur.fetchall()[0]
+            cur.execute("""SELECT id,name,req FROM req_data;""")
+            req_data = cur.fetchall()
 
             #show free member at the day
             freemem_id = []
             print("-----These members are free-----")
             for i in range(len(req_data)):
                 if day not in req_data[i][2].split(',') and req_data[i][0] not in day_data:
-                    self.show_worktime(req_data[i][1])
+                    show_worktime(req_data[i][1])
                     freemem_id.append(req_data[i][0])
             #input insert member id
             while True:
@@ -208,22 +210,22 @@ class Console():
                     break
                 print("illegal input")
 
-            self.cur.execute("""SELECT name,workcnt,worktime FROM mem_data WHERE id = {0};""".format(who))
-            data = self.cur.fetchall()[0]
+            cur.execute("""SELECT name,workcnt,worktime FROM mem_data WHERE id = {0};""".format(who))
+            data = cur.fetchall()[0]
 
             #confirmation and insert member into shift
             confirm = input("Insert {0}?[y/N]:".format(data[0]))
             if confirm == "y":
-                rest = self.get_rest(day)
+                rest = get_rest(day)
                 if day_data[0] is None:
                     insert_pos = 1
                 elif day_data[1] is None:
                     insert_pos = 2
                 elif day_data[2] is None:
                     insert_pos = 3
-                self.cur.execute("""UPDATE day_data SET name{0} = {1} WHERE day = {2};""".format(insert_pos,who,day) )
-                self.cur.execute("""UPDATE mem_data SET workcnt = {0}, worktime = {1} WHERE id = {2};""".format(data[1]+1,data[2]+self.worktime_check(day),who) )
-                self.conn.commit()
+                cur.execute("""UPDATE day_data SET name{0} = {1} WHERE day = {2};""".format(insert_pos,who,day) )
+                cur.execute("""UPDATE mem_data SET workcnt = {0}, worktime = {1} WHERE id = {2};""".format(data[1]+1,data[2]+worktime_check(day),who) )
+                conn.commit()
 
 
     def delete_mem(self):
@@ -233,17 +235,17 @@ class Console():
             day = input("Delete day:")
             if (day == 'q'):
                 return
-            elif self.get_rest(int(day)) == 3:
+            elif get_rest(int(day)) == 3:
                 print("No member assigned")
                 time.sleep(1.5)
                 return
             elif day.isdigit() and int(day) < 32:
                 break
             print("illegal input")
-        self.show_shift(day)
+        show_shift(day)
 
-        self.cur.execute("""SELECT name1,name2,name3 FROM day_data WHERE day = '{0}';""".format(day))
-        name_id = self.cur.fetchall()[0]
+        cur.execute("""SELECT name1,name2,name3 FROM day_data WHERE day = '{0}';""".format(day))
+        name_id = cur.fetchall()[0]
         while(True):
             who = input("who[1,2,3]:")
             if (who == 'q'):
@@ -254,28 +256,135 @@ class Console():
 
         who = int(who)
 
-        self.cur.execute("""SELECT name,workcnt,worktime FROM mem_data WHERE id = '{0}';""".format(name_id))
-        mem_data = self.cur.fetchall()[0]
+        cur.execute("""SELECT name,workcnt,worktime FROM mem_data WHERE id = '{0}';""".format(name_id))
+        mem_data = cur.fetchall()[0]
 
         confirm = input("Delete {0} OK?[y/N]:".format(mem_data[0]))
         if confirm == "y":
-            self.cur.execute("""UPDATE day_data SET name{0} = NULL WHERE day = {1};""".format(who,day) )
-            self.cur.execute("""UPDATE mem_data SET workcnt = {0}, worktime = {1} WHERE id = {2};""".format(mem_data[1]-1,mem_data[2]-self.worktime_check(day),name_id) )
-            self.conn.commit()
+            cur.execute("""UPDATE day_data SET name{0} = NULL WHERE day = {1};""".format(who,day) )
+            cur.execute("""UPDATE mem_data SET workcnt = {0}, worktime = {1} WHERE id = {2};""".format(mem_data[1]-1,mem_data[2]-worktime_check(day),name_id) )
+            conn.commit()
 
     def get_rest(self,day):
-        self.cur.execute("""select sum(name1),sum(name2),sum(name3) from day_data where day == {0}""".format(day))
-        a = self.cur.fetchall()
+        cur.execute("""select sum(name1),sum(name2),sum(name3) from day_data where day == {0}""".format(day))
+        a = cur.fetchall()
         #print("rest shift is",(a[0].count(None)))
         return a[0].count(None)
 
     def quit(self):
-        self.conn.commit()
-        self.conn.close()
+        conn.commit()
+        conn.close()
         exit()
 
 
+#for web app
+def get_day():
+    conn = sqlite3.connect('./day_data.db')
+    cur = conn.cursor()
+    cur.execute("""SELECT day,date,isholi FROM day_data;""")
+    day_data = cur.fetchall()
+    return day_data
+    conn.close()
 
+def get_mem():
+    conn = sqlite3.connect('./day_data.db')
+    cur = conn.cursor()
+    cur.execute("""SELECT month,day,name1,name2,name3 FROM day_data;""")
+    mem_data = cur.fetchall()
+    return mem_data
+    conn.close()
+
+def get_id():
+    conn = sqlite3.connect('./day_data.db')
+    cur = conn.cursor()
+    cur.execute("""SELECT id,name FROM mem_data;""")
+    id_data = cur.fetchall()
+    return id_data
+    conn.close()
+
+def get_time():
+    conn = sqlite3.connect('./day_data.db')
+    cur = conn.cursor()
+    cur.execute("""SELECT id,name,workcnt,worktime FROM mem_data;""")
+    time_data = cur.fetchall()
+    return time_data
+    conn.close()
+
+def get_req():
+    conn = sqlite3.connect('./day_data.db')
+    cur = conn.cursor()
+    cur.execute("""SELECT id,name,req FROM req_data;""")
+    req_data = cur.fetchall()
+    return req_data
+    conn.close()
+
+
+def insert(day,who):
+    conn = sqlite3.connect('./day_data.db')
+    cur = conn.cursor()
+    #open database
+    cur.execute("""SELECT name,worktime,workcnt,id FROM mem_data;""")
+    mem_data = cur.fetchall()
+    cur.execute("""SELECT name1,name2,name3 FROM day_data WHERE day = {0};""".format(day))
+    day_data = cur.fetchall()[0]
+    cur.execute("""SELECT id,name,req FROM req_data;""")
+    req_data = cur.fetchall()
+    cur.execute("""SELECT name,workcnt,worktime FROM mem_data WHERE id = {0};""".format(who))
+    data = cur.fetchall()[0]
+
+    print(day_data)
+    if day_data[0] is None:
+        insert_pos = 1
+    elif day_data[1] is None:
+        insert_pos = 2
+    elif day_data[2] is None:
+        insert_pos = 3
+    print (insert_pos,'day',day)
+
+    cur.execute("""UPDATE day_data SET name{0} = {1} WHERE day = {2};""".format(insert_pos,who,day) )
+    cur.execute("""UPDATE mem_data SET workcnt = {0}, worktime = {1} WHERE id = {2};""".format(data[1]+1,data[2]+worktime_check(day),who) )
+    conn.commit()
+    conn.close()
+
+def worktime_check(day):
+    conn = sqlite3.connect('./day_data.db')
+    cur = conn.cursor()
+    cur.execute("""SELECT isholi,ispreholi FROM day_data WHERE day = {0};""".format(day))
+    a = cur.fetchall()
+    if a == [(0,0)]:
+        return worktime["weekday"]
+    elif a == [(0,1)]:
+        return worktime["bh_weekday"]
+    elif a == [(1,0)]:
+        return worktime["holiday"]
+    elif a == [(1,1)]:
+        return worktime["bh_holiday"]
+
+def delete(day,memid):
+    conn = sqlite3.connect('./day_data.db')
+    cur = conn.cursor()
+    cur.execute("""SELECT name1,name2,name3 FROM day_data WHERE day = '{0}';""".format(day))
+    name_id = cur.fetchall()[0]
+    who = 0
+    print('fetch',memid)
+    if name_id[0] == int(memid):
+        who = 1
+    elif name_id[1] == int(memid):
+        who = 2
+    elif name_id[2] == int(memid):
+        who = 3
+    print('del pos ',who)
+
+    cur.execute("""SELECT name,workcnt,worktime FROM mem_data WHERE id = '{0}';""".format(memid))
+    mem_data = cur.fetchall()[0]
+    print(mem_data)
+
+    cur.execute("""UPDATE day_data SET name{0} = NULL WHERE day = {1};""".format(who,day) )
+    cur.execute("""UPDATE mem_data SET workcnt = {0}, worktime = {1} WHERE id = {2};""".format(mem_data[1]-1,mem_data[2]-worktime_check(day),memid) )
+    # print(mem_data[1]-1,'/',mem_data[2]-worktime_check(day),memid)
+
+    conn.commit()
+    conn.close()
 
 def main():
     console = Console().show()
